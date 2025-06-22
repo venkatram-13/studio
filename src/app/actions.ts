@@ -22,6 +22,7 @@ export async function handleRewriteContent(data: FormData) {
     return {
       rewrittenContent: result.rewrittenContent,
       applyLink: validatedData.applyLink,
+      imageUrl: result.imageUrl,
     };
   } catch (error) {
     console.error('Error in handleRewriteContent:', error);

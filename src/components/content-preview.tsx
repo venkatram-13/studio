@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -13,6 +14,7 @@ type ContentPreviewProps = {
   result: {
     rewrittenContent: string;
     applyLink: string;
+    imageUrl?: string;
   } | null;
   isLoading: boolean;
 };
@@ -67,6 +69,10 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
     return <Placeholder />;
   }
 
+  const fullMarkdown = result.imageUrl
+    ? `![Blog Post Image](${result.imageUrl})\n\n${result.rewrittenContent}`
+    : result.rewrittenContent;
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
@@ -87,9 +93,20 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
               Markdown
             </TabsTrigger>
           </TabsList>
-          <div className="flex-1 overflow-y-auto mt-4">
+          <div className="flex-1 overflow-y-auto mt-4 pr-2">
             <TabsContent value="preview">
-              <div className="markdown-preview prose-lg">
+              <div className="markdown-preview">
+                {result.imageUrl && (
+                  <div className="relative w-full aspect-video mb-6">
+                    <Image
+                      src={result.imageUrl}
+                      alt="Blog post image"
+                      fill
+                      className="rounded-lg object-cover"
+                      data-ai-hint="blog post"
+                    />
+                  </div>
+                )}
                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {result.rewrittenContent}
                 </ReactMarkdown>
@@ -106,7 +123,7 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
             <TabsContent value="markdown">
               <div className="bg-muted p-4 rounded-md relative">
                 <pre className="text-sm font-code whitespace-pre-wrap break-words">
-                  <code>{result.rewrittenContent}</code>
+                  <code>{fullMarkdown}</code>
                 </pre>
               </div>
             </TabsContent>

@@ -23,8 +23,13 @@ const RewriteBlogContentInputSchema = z.object({
 });
 export type RewriteBlogContentInput = z.infer<typeof RewriteBlogContentInputSchema>;
 
+const PromptOutputSchema = z.object({
+  rewrittenContent: z.string().describe('The rewritten blog content with a table of contents.'),
+});
+
 const RewriteBlogContentOutputSchema = z.object({
   rewrittenContent: z.string().describe('The rewritten blog content with a table of contents.'),
+  imageUrl: z.string().optional(),
 });
 export type RewriteBlogContentOutput = z.infer<typeof RewriteBlogContentOutputSchema>;
 
@@ -35,7 +40,7 @@ export async function rewriteBlogContent(input: RewriteBlogContentInput): Promis
 const rewriteBlogContentPrompt = ai.definePrompt({
   name: 'rewriteBlogContentPrompt',
   input: {schema: RewriteBlogContentInputSchema},
-  output: {schema: RewriteBlogContentOutputSchema},
+  output: {schema: PromptOutputSchema},
   prompt: `You are an expert blog content writer. Your task is to rewrite the provided blog content to enhance readability and engagement.
 
 **Instructions:**
@@ -43,22 +48,21 @@ const rewriteBlogContentPrompt = ai.definePrompt({
 1.  **Table of Contents:**
     *   Generate a markdown-formatted table of contents for the rewritten blog post.
     *   Use markdown links (e.g., \`[Section 1](#section-1)\`) for each item.
-    *   Make the Table of Contents collapsible by wrapping it in HTML \`<details>\` and \`<summary>\` tags.
+    *   Make the Table of Contents collapsible by wrapping it in HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags.
 
 2.  **Rewritten Content:**
-    *   Rewrite the original content provided below.
+    *   Rewrite the original content provided in the input.
     *   Improve clarity, flow, and engagement.
-    *   Ensure the headings in the rewritten content have corresponding HTML anchors that match the links in the table of contents. For example, a heading for "Section 1" should be written as \`## <a id="section-1"></a>Section 1\`.
+    *   Ensure the headings in the rewritten content have corresponding HTML anchors that match the links in the table of contents. For example, a heading for "Section 1" should be written as \`## <a id="section-1"></a>Section 1\`. The ID should be lowercase and use hyphens for spaces.
 
 **Input:**
 
 *   **Title:** \`{{{title}}}\`
 *   **Original Content/URL:** \`{{{content}}}\`
-*   **Image URL:** \`{{{imageUrl}}}\`
 
 **Output:**
 
-Provide a single markdown string that contains the collapsible table of contents, followed by the full rewritten blog post with linked headings.
+Provide a single markdown string that contains the collapsible table of contents, followed by the full rewritten blog post with linked headings. Do not include the title in your output.
 `,
 });
 
@@ -70,6 +74,9 @@ const rewriteBlogContentFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await rewriteBlogContentPrompt(input);
-    return output!;
+    return {
+      rewrittenContent: output!.rewrittenContent,
+      imageUrl: input.imageUrl,
+    };
   }
 );
