@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Rocket, FileText, Image as ImageIcon, Link as LinkIcon, Heading1 } from 'lucide-react';
+import { Rocket, FileText, Link as LinkIcon, Heading1 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewriteFormSchema } from '@/lib/schemas';
 
@@ -31,7 +31,6 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
     defaultValues: {
       title: '',
       content: '',
-      imageUrl: '',
       applyLink: '',
     },
   });
@@ -78,23 +77,6 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
                         className="min-h-[200px] pl-9"
                         {...field}
                       />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
-                   <div className="relative">
-                    <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <FormControl>
-                      <Input placeholder="https://example.com/image.png" className="pl-9" {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />

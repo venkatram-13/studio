@@ -12,7 +12,6 @@ export async function handleRewriteContent(data: FormData) {
 
     const result = await rewriteBlogContent({
       ...validatedData,
-      imageUrl: validatedData.imageUrl || '',
     });
 
     if (!result || !result.rewrittenContent) {
@@ -22,7 +21,6 @@ export async function handleRewriteContent(data: FormData) {
     return {
       rewrittenContent: result.rewrittenContent,
       applyLink: validatedData.applyLink,
-      imageUrl: result.imageUrl,
     };
   } catch (error) {
     console.error('Error in handleRewriteContent:', error);

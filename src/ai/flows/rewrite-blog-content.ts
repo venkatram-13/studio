@@ -18,7 +18,6 @@ const RewriteBlogContentInputSchema = z.object({
     .string()
     .describe('The blog content to rewrite. Can be text or a blog URL.'),
   title: z.string().describe('The title of the blog.'),
-  imageUrl: z.string().describe('The URL of the blog image.'),
   applyLink: z.string().describe('The link for users to apply.'),
 });
 export type RewriteBlogContentInput = z.infer<typeof RewriteBlogContentInputSchema>;
@@ -29,7 +28,6 @@ const PromptOutputSchema = z.object({
 
 const RewriteBlogContentOutputSchema = z.object({
   rewrittenContent: z.string().describe('The rewritten blog content with a table of contents.'),
-  imageUrl: z.string().optional(),
 });
 export type RewriteBlogContentOutput = z.infer<typeof RewriteBlogContentOutputSchema>;
 
@@ -76,7 +74,6 @@ const rewriteBlogContentFlow = ai.defineFlow(
     const {output} = await rewriteBlogContentPrompt(input);
     return {
       rewrittenContent: output!.rewrittenContent,
-      imageUrl: input.imageUrl,
     };
   }
 );
