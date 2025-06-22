@@ -36,17 +36,29 @@ const rewriteBlogContentPrompt = ai.definePrompt({
   name: 'rewriteBlogContentPrompt',
   input: {schema: RewriteBlogContentInputSchema},
   output: {schema: RewriteBlogContentOutputSchema},
-  prompt: `You are an expert blog content writer.
+  prompt: `You are an expert blog content writer. Your task is to rewrite the provided blog content to enhance readability and engagement.
 
-You will rewrite the given blog content to improve readability and engagement.
-You will also generate a table of contents with collapsable sections for the rewritten content.
-The table of contents should link to the appropriate sections within the rewritten content.
+**Instructions:**
 
-Title: {{{title}}}
-Image URL: {{{imageUrl}}}
-Content: {{{content}}}
+1.  **Table of Contents:**
+    *   Generate a markdown-formatted table of contents for the rewritten blog post.
+    *   Use markdown links (e.g., \`[Section 1](#section-1)\`) for each item.
+    *   Make the Table of Contents collapsible by wrapping it in HTML \`<details>\` and \`<summary>\` tags.
 
-Rewrite the content and include a table of contents:
+2.  **Rewritten Content:**
+    *   Rewrite the original content provided below.
+    *   Improve clarity, flow, and engagement.
+    *   Ensure the headings in the rewritten content have corresponding HTML anchors that match the links in the table of contents. For example, a heading for "Section 1" should be written as \`## <a id="section-1"></a>Section 1\`.
+
+**Input:**
+
+*   **Title:** \`{{{title}}}\`
+*   **Original Content/URL:** \`{{{content}}}\`
+*   **Image URL:** \`{{{imageUrl}}}\`
+
+**Output:**
+
+Provide a single markdown string that contains the collapsible table of contents, followed by the full rewritten blog post with linked headings.
 `,
 });
 

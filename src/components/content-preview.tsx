@@ -2,6 +2,7 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -89,7 +90,7 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
           <div className="flex-1 overflow-y-auto mt-4">
             <TabsContent value="preview">
               <div className="markdown-preview prose-lg">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {result.rewrittenContent}
                 </ReactMarkdown>
               </div>
