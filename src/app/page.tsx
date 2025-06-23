@@ -10,6 +10,8 @@ import { WandSparkles } from 'lucide-react';
 import { RewriteFormSchema } from '@/lib/schemas';
 import { ThemeToggle } from '@/components/theme-toggle';
 
+type FormData = z.infer<typeof RewriteFormSchema>;
+
 type PartialResult = {
   rewrittenContent: string | null;
   applyLink: string | null;
@@ -21,56 +23,74 @@ export default function Home() {
   const [result, setResult] = useState<PartialResult | null>(null);
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
+  const [lastSubmittedData, setLastSubmittedData] = useState<FormData | null>(
+    null
+  );
   const { toast } = useToast();
 
-  const handleFormSubmit = async (data: z.infer<typeof RewriteFormSchema>) => {
-    setResult(null);
+  const handleTextGeneration = async (data: FormData) => {
     setIsContentLoading(true);
+    try {
+      const response = await generateTextContent(data);
+      setResult((prev) => ({
+        ...prev,
+        rewrittenContent: response.rewrittenContent,
+        applyLink: response.applyLink,
+        source: response.source,
+      }));
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Error generating content',
+        description:
+          error instanceof Error ? error.message : 'Please try again.',
+      });
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const handleImageGeneration = async (data: FormData) => {
     setIsImageLoading(true);
-
-    const textPromise = generateTextContent(data)
-      .then((response) => {
-        setResult((prev) => ({
-          ...prev,
-          rewrittenContent: response.rewrittenContent,
-          applyLink: response.applyLink,
-          source: response.source,
-        }));
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: 'Error generating content',
-          description:
-            error instanceof Error ? error.message : 'Please try again.',
-        });
-      })
-      .finally(() => {
-        setIsContentLoading(false);
+    try {
+      const response = await generateHeaderImage(data);
+      setResult((prev) => ({
+        ...prev,
+        generatedImage: response.generatedImage,
+      }));
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Error generating image',
+        description:
+          error instanceof Error ? error.message : 'Please try again.',
       });
+    } finally {
+      setIsImageLoading(false);
+    }
+  };
 
-    const imagePromise = generateHeaderImage(data)
-      .then((response) => {
-        setResult((prev) => ({
-          ...prev,
-          generatedImage: response.generatedImage,
-        }));
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: 'Error generating image',
-          description:
-            error instanceof Error ? error.message : 'Please try again.',
-        });
-      })
-      .finally(() => {
-        setIsImageLoading(false);
-      });
+  const handleFormSubmit = async (data: FormData) => {
+    setLastSubmittedData(data);
+    setResult(null);
+    await Promise.allSettled([
+      handleTextGeneration(data),
+      handleImageGeneration(data),
+    ]);
+  };
 
-    await Promise.allSettled([textPromise, imagePromise]);
+  const handleRegenerateContent = () => {
+    if (lastSubmittedData) {
+      handleTextGeneration(lastSubmittedData);
+    }
+  };
+
+  const handleRegenerateImage = () => {
+    if (lastSubmittedData) {
+      handleImageGeneration(lastSubmittedData);
+    }
   };
 
   const isLoading = isContentLoading || isImageLoading;
@@ -85,8 +105,12 @@ export default function Home() {
                 <WandSparkles className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground font-headline">ContentForge</h1>
-                <p className="text-sm text-muted-foreground">AI-powered content rewriting and enhancement.</p>
+                <h1 className="text-2xl font-bold text-foreground font-headline">
+                  ContentForge
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  AI-powered content rewriting and enhancement.
+                </p>
               </div>
             </div>
             <ThemeToggle />
@@ -97,13 +121,18 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6 h-full py-8">
           <div className="grid lg:grid-cols-2 gap-8 h-full items-start">
             <div className="h-full overflow-y-auto rounded-lg pr-4">
-              <ContentForgeForm onSubmit={handleFormSubmit} isPending={isLoading} />
+              <ContentForgeForm
+                onSubmit={handleFormSubmit}
+                isPending={isLoading}
+              />
             </div>
             <div className="h-full overflow-y-auto rounded-lg pr-4">
               <ContentPreview
                 result={result}
                 isContentLoading={isContentLoading}
                 isImageLoading={isImageLoading}
+                onRegenerateContent={handleRegenerateContent}
+                onRegenerateImage={handleRegenerateImage}
               />
             </div>
           </div>

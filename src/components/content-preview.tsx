@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Code, Sparkles, ExternalLink, Clipboard, Check, Download, Info } from 'lucide-react';
+import { Code, Sparkles, ExternalLink, Clipboard, Check, Download, Info, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type ContentPreviewProps = {
   result: {
@@ -20,6 +21,8 @@ type ContentPreviewProps = {
   } | null;
   isContentLoading: boolean;
   isImageLoading: boolean;
+  onRegenerateContent: () => void;
+  onRegenerateImage: () => void;
 };
 
 const TextContentSkeleton = () => (
@@ -53,7 +56,7 @@ const Placeholder = () => (
 );
 
 
-export function ContentPreview({ result, isContentLoading, isImageLoading }: ContentPreviewProps) {
+export function ContentPreview({ result, isContentLoading, isImageLoading, onRegenerateContent, onRegenerateImage }: ContentPreviewProps) {
   const [isCopied, setIsCopied] = useState(false);
   const isLoading = isContentLoading || isImageLoading;
 
@@ -79,12 +82,28 @@ export function ContentPreview({ result, isContentLoading, isImageLoading }: Con
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>Generated Content</CardTitle>
-        <CardDescription>
-          Here is the AI-generated version of your content and image.
-        </CardDescription>
+        <div className="flex justify-between items-start gap-2">
+          <div>
+            <CardTitle>Generated Content</CardTitle>
+            <CardDescription className="mt-1.5">
+              Here is the AI-generated version of your content and image.
+            </CardDescription>
+          </div>
+          {result?.rewrittenContent && !isContentLoading && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onRegenerateContent}
+              disabled={isContentLoading}
+              title="Regenerate Content"
+              className="h-8 w-8 shrink-0"
+            >
+              <RefreshCw className={cn('h-4 w-4', isContentLoading && 'animate-spin')} />
+            </Button>
+          )}
+        </div>
         {result?.source && !isContentLoading && (
-          <Alert className="mt-2 text-sm">
+          <Alert className="mt-4 text-sm">
             <Info className="h-4 w-4" />
             <AlertDescription>
               {sourceText}
@@ -117,17 +136,30 @@ export function ContentPreview({ result, isContentLoading, isImageLoading }: Con
                       className="w-full h-auto"
                       data-ai-hint="blog image"
                     />
-                    <Button
-                      asChild
-                      variant="secondary"
-                      size="icon"
-                      className="absolute top-3 right-3 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <a href={result.generatedImage} download="generated-header-image.png">
-                        <Download className="h-5 w-5" />
-                        <span className="sr-only">Download Image</span>
-                      </a>
-                    </Button>
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        asChild
+                        variant="secondary"
+                        size="icon"
+                        className="h-9 w-9"
+                      >
+                        <a href={result.generatedImage} download="generated-header-image.png">
+                          <Download className="h-5 w-5" />
+                          <span className="sr-only">Download Image</span>
+                        </a>
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={onRegenerateImage}
+                        disabled={isImageLoading}
+                        title="Regenerate Image"
+                      >
+                        <RefreshCw className={cn('h-5 w-5', isImageLoading && 'animate-spin')} />
+                        <span className="sr-only">Regenerate Image</span>
+                      </Button>
+                    </div>
                   </div>
                 )
               )}
