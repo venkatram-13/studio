@@ -75,6 +75,11 @@ export default function Home() {
   const handleFormSubmit = async (data: FormData) => {
     setLastSubmittedData(data);
     setResult(null);
+
+    if (window.innerWidth < 1024) {
+      document.getElementById('preview-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     await Promise.allSettled([
       handleTextGeneration(data),
       handleImageGeneration(data),
@@ -96,8 +101,8 @@ export default function Home() {
   const isLoading = isContentLoading || isImageLoading;
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="shrink-0 border-b bg-card">
+    <div className="flex flex-col min-h-screen">
+      <header className="shrink-0 border-b bg-card sticky top-0 z-20">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex h-20 items-center justify-between">
             <div className="flex items-center gap-3">
@@ -105,7 +110,7 @@ export default function Home() {
                 <WandSparkles className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground font-headline">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground font-headline">
                   ContentForge
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -117,16 +122,16 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1">
         <div className="container mx-auto px-4 md:px-6 h-full py-8">
-          <div className="grid lg:grid-cols-2 gap-8 h-full items-start">
-            <div className="h-full overflow-y-auto rounded-lg pr-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            <div className="lg:sticky lg:top-28">
               <ContentForgeForm
                 onSubmit={handleFormSubmit}
                 isPending={isLoading}
               />
             </div>
-            <div className="h-full overflow-y-auto rounded-lg pr-4">
+            <div id="preview-section">
               <ContentPreview
                 result={result}
                 isContentLoading={isContentLoading}
