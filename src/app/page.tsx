@@ -12,6 +12,7 @@ import { RewriteFormSchema } from '@/lib/schemas';
 type RewriteResult = {
   rewrittenContent: string;
   applyLink: string;
+  generatedImage: string | null;
 } | null;
 
 export default function Home() {

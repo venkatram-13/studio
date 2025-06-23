@@ -14,6 +14,7 @@ type ContentPreviewProps = {
   result: {
     rewrittenContent: string;
     applyLink: string;
+    generatedImage: string | null;
   } | null;
   isLoading: boolean;
 };
@@ -25,6 +26,7 @@ const LoadingSkeleton = () => (
       <Skeleton className="h-4 w-4/5 mt-2" />
     </CardHeader>
     <CardContent className="space-y-4">
+       <Skeleton className="w-full aspect-video rounded-lg" />
       <div className="space-y-2">
         <Skeleton className="h-5 w-1/4" />
         <Skeleton className="h-4 w-1/2" />
@@ -35,11 +37,6 @@ const LoadingSkeleton = () => (
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
-      </div>
-      <div className="space-y-2 pt-4">
-        <Skeleton className="h-5 w-1/3" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
       </div>
     </CardContent>
   </Card>
@@ -53,7 +50,7 @@ const Placeholder = () => (
       </div>
       <h3 className="text-2xl font-semibold font-headline">Content Appears Here</h3>
       <p className="text-muted-foreground mt-2 max-w-md">
-        Once you submit your content, the rewritten version will be displayed here. You can switch between a rendered preview and raw markdown.
+        Once you submit your content, the rewritten version and generated image will be displayed here.
       </p>
     </div>
   </Card>
@@ -87,7 +84,7 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
       <CardHeader>
         <CardTitle>Generated Content</CardTitle>
         <CardDescription>
-          Here is the AI-rewritten version of your content.
+          Here is the AI-generated version of your content and image.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 min-h-0">
@@ -104,6 +101,16 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
           </TabsList>
           <div className="flex-1 overflow-y-auto mt-4 pr-2">
             <TabsContent value="preview">
+              {result.generatedImage && (
+                <div className="mb-6 rounded-lg overflow-hidden shadow-lg">
+                  <img
+                    src={result.generatedImage}
+                    alt="AI Generated Image"
+                    className="w-full h-auto"
+                    data-ai-hint="generated image"
+                  />
+                </div>
+              )}
               <div className="markdown-preview">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                   {result.rewrittenContent}

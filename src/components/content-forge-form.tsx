@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Rocket, FileText, Link as LinkIcon, Heading1 } from 'lucide-react';
+import { Rocket, FileText, Link as LinkIcon, Heading1, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewriteFormSchema } from '@/lib/schemas';
 
@@ -31,6 +31,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
     defaultValues: {
       title: '',
       content: '',
+      imagePrompt: '',
       applyLink: '',
     },
   });
@@ -40,7 +41,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
       <CardHeader>
         <CardTitle>Content to Rewrite</CardTitle>
         <CardDescription>
-          Enter the post details below. The AI will rewrite the content and generate a table of contents.
+          Enter the post details below. The AI will rewrite the content, generate a table of contents, and create a header image.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -86,6 +87,30 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
 
             <FormField
               control={form.control}
+              name="imagePrompt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image Prompt (Optional)</FormLabel>
+                  <div className="relative">
+                    <ImageIcon className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g., A futuristic cityscape with flying cars, photorealistic"
+                        className="min-h-[80px] pl-9"
+                        {...field}
+                      />
+                    </FormControl>
+                  </div>
+                   <FormDescription>
+                    Describe the header image you want the AI to generate.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="applyLink"
               render={({ field }) => (
                 <FormItem>
@@ -103,7 +128,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
 
             <Button type="submit" disabled={isPending} className="w-full">
               <Rocket className={cn("mr-2 h-4 w-4", isPending && "animate-spin")} />
-              {isPending ? 'Rewriting Content...' : 'Rewrite Content'}
+              {isPending ? 'Generating...' : 'Generate Content'}
             </Button>
           </form>
         </Form>
