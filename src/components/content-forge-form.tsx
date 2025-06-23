@@ -17,10 +17,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Rocket, FileText, Link as LinkIcon, Heading1, Link2, CaseSensitive } from 'lucide-react';
+import { Rocket, FileText, Link as LinkIcon, Heading1, Link2, CaseSensitive, Image, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewriteFormSchema } from '@/lib/schemas';
-import { useEffect } from 'react';
 
 type ContentForgeFormProps = {
   onSubmit: (values: z.infer<typeof RewriteFormSchema>) => void;
@@ -35,10 +34,12 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
       content: '',
       url: '',
       applyLink: '',
+      imageUrl: '',
+      imagePrompt: '',
     },
   });
 
-  const onTabsChange = (value: string) => {
+  const onContentTabsChange = (value: string) => {
     if (value === 'url') {
       form.setValue('content', '');
     } else {
@@ -75,7 +76,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
               )}
             />
 
-            <Tabs defaultValue="url" className="w-full" onValueChange={onTabsChange}>
+            <Tabs defaultValue="url" className="w-full" onValueChange={onContentTabsChange}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="url"><Link2 className="mr-2 h-4 w-4" /> From URL</TabsTrigger>
                 <TabsTrigger value="text"><CaseSensitive className="mr-2 h-4 w-4" /> Paste Text</TabsTrigger>
@@ -124,6 +125,49 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
               </TabsContent>
             </Tabs>
             
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Header Image URL (Optional)</FormLabel>
+                  <div className="relative">
+                    <Image className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Input placeholder="https://example.com/image.png" className="pl-9" {...field} />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="relative flex justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="imagePrompt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Generate Header Image (Optional)</FormLabel>
+                  <div className="relative">
+                    <Wand2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Input placeholder="e.g., A futuristic cityscape at dusk" className="pl-9" {...field} />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="applyLink"

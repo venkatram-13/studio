@@ -107,7 +107,7 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
                     src={result.generatedImage}
                     alt="AI Generated Image"
                     className="w-full h-auto"
-                    data-ai-hint="generated image"
+                    data-ai-hint="blog image"
                   />
                 </div>
               )}
