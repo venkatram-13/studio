@@ -44,6 +44,9 @@ export async function handleRewriteContent(data: FormData) {
     if (error instanceof z.ZodError) {
       throw new Error(`Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
     }
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
     throw new Error('An unexpected error occurred while processing your request.');
   }
 }
