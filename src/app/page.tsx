@@ -8,6 +8,7 @@ import { handleRewriteContent } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { WandSparkles } from 'lucide-react';
 import { RewriteFormSchema } from '@/lib/schemas';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type RewriteResult = {
   rewrittenContent: string;
@@ -43,7 +44,7 @@ export default function Home() {
     <div className="flex flex-col h-screen">
       <header className="shrink-0 border-b bg-card">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex h-20 items-center">
+          <div className="flex h-20 items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 p-2 rounded-lg">
                 <WandSparkles className="h-6 w-6 text-primary" />
@@ -53,6 +54,7 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">AI-powered content rewriting and enhancement.</p>
               </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
