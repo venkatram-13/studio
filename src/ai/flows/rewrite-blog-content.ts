@@ -50,7 +50,7 @@ Your mission is to rewrite the provided blog content, elevating it to a professi
 
 2.  **Rewrite based on Core Directives:**
     *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy to follow. Ensure smooth transitions between ideas and sections.
-    *   **Engagement:** Adopt a professional yet approachable tone. Use storytelling, relevant examples, and rhetorical questions to captivate the reader.
+    *   **Tone & Style:** The tone must be strictly professional and authoritative. Avoid colloquialisms, overly casual language, and subjective statements. The writing style should be clear, direct, and formal. Use storytelling and relevant examples where appropriate to enhance clarity, but maintain a professional demeanor throughout.
     *   **Value Addition:** Do not just rephrase. Enrich the original text by adding valuable insights, fresh perspectives, or clarifying complex points.
     *   **Length:** The target length for the rewritten post is approximately 800 words. Prioritize quality, depth, and impact over meeting a strict word count.
 
