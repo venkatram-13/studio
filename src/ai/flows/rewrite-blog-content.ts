@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Rewrites blog content to improve readability and engagement.
+ * @fileOverview Rewrites job postings to attract top talent.
  *
- * - rewriteBlogContent - A function that rewrites blog content.
+ * - rewriteBlogContent - A function that rewrites job posting content.
  * - RewriteBlogContentInput - The input type for the rewriteBlogContent function.
  * - RewriteBlogContentOutput - The return type for the rewriteBlogContent function.
  */
@@ -13,19 +13,19 @@ import {z} from 'zod';
 import { urlScraperTool } from '@/ai/tools/url-scraper';
 
 const RewriteBlogContentInputSchema = z.object({
-  title: z.string().describe('The title of the blog.'),
-  content: z.string().optional().describe('The blog content to rewrite. Use this if raw text is provided.'),
-  url: z.string().url().optional().describe('A URL to a blog post. Use this to scrape content first.'),
+  title: z.string().describe('The job title.'),
+  content: z.string().optional().describe('The job posting content to rewrite. Use this if raw text is provided.'),
+  url: z.string().url().optional().describe('A URL to a job posting. Use this to scrape content first.'),
   applyLink: z.string().describe('The link for users to apply.'),
 });
 export type RewriteBlogContentInput = z.infer<typeof RewriteBlogContentInputSchema>;
 
 const PromptOutputSchema = z.object({
-  rewrittenContent: z.string().describe('The rewritten blog content with a table of contents.'),
+  rewrittenContent: z.string().describe('The rewritten job posting with a table of contents.'),
 });
 
 const RewriteBlogContentOutputSchema = z.object({
-  rewrittenContent: z.string().describe('The rewritten blog content with a table of contents.'),
+  rewrittenContent: z.string().describe('The rewritten job posting with a table of contents.'),
 });
 export type RewriteBlogContentOutput = z.infer<typeof RewriteBlogContentOutputSchema>;
 
@@ -38,9 +38,9 @@ const rewriteBlogContentPrompt = ai.definePrompt({
   tools: [urlScraperTool],
   input: {schema: RewriteBlogContentInputSchema},
   output: {schema: PromptOutputSchema},
-  prompt: `You are an elite content strategist and SEO expert, renowned for transforming dry or complex topics into compelling, insightful, and highly engaging blog posts.
+  prompt: `You are an expert recruitment copywriter and employer branding specialist, renowned for crafting job descriptions that attract and engage top-tier candidates.
 
-Your mission is to rewrite the provided blog content, elevating it to a professional standard.
+Your mission is to rewrite the provided job posting content, transforming it from a simple list of duties into a compelling career opportunity.
 
 **Execution Steps:**
 
@@ -49,29 +49,28 @@ Your mission is to rewrite the provided blog content, elevating it to a professi
     *   If the \`content\` field is provided, use that text directly as the source.
 
 2.  **Rewrite based on Core Directives:**
-    *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy to follow. Ensure smooth transitions between ideas and sections.
-    *   **Tone & Style:** The tone must be strictly professional and authoritative. Avoid colloquialisms, overly casual language, and subjective statements. The writing style should be clear, direct, and formal. Use storytelling and relevant examples where appropriate to enhance clarity, but maintain a professional demeanor throughout.
-    *   **Value Addition:** Do not just rephrase. Enrich the original text by adding valuable insights, fresh perspectives, or clarifying complex points.
-    *   **Length:** The target length for the rewritten post is approximately 800 words. Prioritize quality, depth, and impact over meeting a strict word count.
+    *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy for a potential candidate to follow. Structure the content logically, perhaps with sections like "About Us," "The Role," "Your Responsibilities," "What You'll Bring," and "Why You'll Love Working Here."
+    *   **Tone & Style:** The tone must be professional, yet warm, engaging, and inclusive. Use an active voice and speak directly to the candidate (e.g., "You will..." instead of "The successful candidate will..."). Avoid corporate jargon and clichés. The goal is to make the company and role sound exciting and appealing.
+    *   **Value Proposition:** Don't just list requirements. Sell the opportunity. Highlight the company culture, growth opportunities, impactful projects, and key benefits. Frame the role in terms of what the candidate will achieve and learn.
 
 3.  **Apply Structural Requirements (Strictly follow):**
     *   **Table of Contents (TOC):**
-        *   Generate a markdown-formatted, collapsible TOC using HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags.
-        *   Each TOC item must be a markdown link pointing to a corresponding section anchor (e.g., \`[Section Title](#section-title)\`).
+        *   Generate a markdown-formatted, collapsible TOC using HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags. This will help candidates navigate the job description.
+        *   Each TOC item must be a markdown link pointing to a corresponding section anchor (e.g., \`[About Us](#about-us)\`).
     *   **Headings & Anchors:**
         *   The rewritten content must be structured with H2 and H3 markdown headings.
         *   Crucially, every heading must have an HTML anchor tag with an ID that matches its TOC link. The ID must be lowercase with hyphens for spaces.
-        *   **Example:** A section titled "Our Core Mission" should be formatted as \`## <a id="our-core-mission"></a>Our Core Mission\`.
+        *   **Example:** A section titled "About Us" should be formatted as \`## <a id="about-us"></a>About Us\`.
 
 **Input Data:**
 
-*   **Title:** \`{{{title}}}\`
+*   **Job Title:** \`{{{title}}}\`
 *   **Original Content URL (optional):** \`{{{url}}}\`
 *   **Original Content Text (optional):** \`{{{content}}}\`
 
 **Final Output Format:**
 
-Produce a single markdown string. This string must begin with the complete collapsible HTML table of contents, immediately followed by the full, rewritten blog post with the correctly formatted and anchored headings. Do not include the title in the output itself.
+Produce a single markdown string. This string must begin with the complete collapsible HTML table of contents, immediately followed by the full, rewritten job posting with the correctly formatted and anchored headings. Do not include the title in the output itself.
 `,
 });
 
