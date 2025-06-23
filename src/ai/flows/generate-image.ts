@@ -33,9 +33,12 @@ const generateImageFlow = ai.defineFlow(
       return null;
     }
 
+    // Enhance the prompt for better quality
+    const enhancedPrompt = `${prompt}, professional job posting header image, high detail, cinematic lighting, 4k`;
+
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: prompt,
+      prompt: enhancedPrompt,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },
