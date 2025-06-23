@@ -16,9 +16,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Rocket, FileText, Link as LinkIcon, Heading1, ImageIcon, Link2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Rocket, FileText, Link as LinkIcon, Heading1, Link2, CaseSensitive } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewriteFormSchema } from '@/lib/schemas';
+import { useEffect } from 'react';
 
 type ContentForgeFormProps = {
   onSubmit: (values: z.infer<typeof RewriteFormSchema>) => void;
@@ -31,18 +33,26 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
     defaultValues: {
       title: '',
       content: '',
-      imageUrl: '',
-      imagePrompt: '',
+      url: '',
       applyLink: '',
     },
   });
+
+  const onTabsChange = (value: string) => {
+    if (value === 'url') {
+      form.setValue('content', '');
+    } else {
+      form.setValue('url', '');
+    }
+    form.clearErrors(['content', 'url']);
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Content to Rewrite</CardTitle>
         <CardDescription>
-          Enter the post details below. The AI will rewrite the content and create a header image.
+          Enter the post details below. Provide a URL to scrape or paste the content directly.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -65,82 +75,55 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content or Blog URL</FormLabel>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                    <FormControl>
-                      <Textarea
-                        placeholder="Paste your blog content or a URL to the post..."
-                        className="min-h-[200px] pl-9"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Header Image URL (Optional)</FormLabel>
-                  <div className="relative">
-                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <FormControl>
-                      <Input placeholder="https://example.com/image.png" className="pl-9" {...field} />
-                    </FormControl>
-                  </div>
-                   <FormDescription>
-                    Provide a direct link to an image to use as the header.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="relative flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or
-                </span>
-              </div>
-            </div>
-
-            <FormField
-              control={form.control}
-              name="imagePrompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Generate Header Image (Optional)</FormLabel>
-                  <div className="relative">
-                    <ImageIcon className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., A futuristic cityscape with flying cars, photorealistic"
-                        className="min-h-[80px] pl-9"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                   <FormDescription>
-                    If you don't provide an image URL, describe the header image you want the AI to generate.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            <Tabs defaultValue="url" className="w-full" onValueChange={onTabsChange}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="url"><Link2 className="mr-2 h-4 w-4" /> From URL</TabsTrigger>
+                <TabsTrigger value="text"><CaseSensitive className="mr-2 h-4 w-4" /> Paste Text</TabsTrigger>
+              </TabsList>
+              <TabsContent value="url" className="pt-4">
+                <FormField
+                  control={form.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Blog Post URL</FormLabel>
+                      <div className="relative">
+                        <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <FormControl>
+                          <Input placeholder="https://example.com/blog/my-post" className="pl-9" {...field} />
+                        </FormControl>
+                      </div>
+                      <FormDescription>The AI will fetch and rewrite the content from this link.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+              <TabsContent value="text" className="pt-4">
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content</FormLabel>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                        <FormControl>
+                          <Textarea
+                            placeholder="Paste your blog content here..."
+                            className="min-h-[200px] pl-9"
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormDescription>Paste the raw text you want to rewrite.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+            </Tabs>
+            
             <FormField
               control={form.control}
               name="applyLink"

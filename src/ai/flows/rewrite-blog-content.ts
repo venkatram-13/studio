@@ -9,13 +9,13 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
+import { urlScraperTool } from '@/ai/tools/url-scraper';
 
 const RewriteBlogContentInputSchema = z.object({
-  content: z
-    .string()
-    .describe('The blog content to rewrite. Can be text or a blog URL.'),
   title: z.string().describe('The title of the blog.'),
+  content: z.string().optional().describe('The blog content to rewrite. Use this if raw text is provided.'),
+  url: z.string().url().optional().describe('A URL to a blog post. Use this to scrape content first.'),
   applyLink: z.string().describe('The link for users to apply.'),
 });
 export type RewriteBlogContentInput = z.infer<typeof RewriteBlogContentInputSchema>;
@@ -35,21 +35,26 @@ export async function rewriteBlogContent(input: RewriteBlogContentInput): Promis
 
 const rewriteBlogContentPrompt = ai.definePrompt({
   name: 'rewriteBlogContentPrompt',
+  tools: [urlScraperTool],
   input: {schema: RewriteBlogContentInputSchema},
   output: {schema: PromptOutputSchema},
   prompt: `You are an elite content strategist and SEO expert, renowned for transforming dry or complex topics into compelling, insightful, and highly engaging blog posts.
 
 Your mission is to rewrite the provided blog content, elevating it to a professional standard.
 
-**Core Directives:**
+**Execution Steps:**
 
-1.  **Content Transformation:**
+1.  **Determine Content Source:**
+    *   If the \`url\` field is provided, you **must** use the \`urlScraperTool\` to fetch the content from that URL. Use the returned text as the source for rewriting.
+    *   If the \`content\` field is provided, use that text directly as the source.
+
+2.  **Rewrite based on Core Directives:**
     *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy to follow. Ensure smooth transitions between ideas and sections.
     *   **Engagement:** Adopt a professional yet approachable tone. Use storytelling, relevant examples, and rhetorical questions to captivate the reader.
     *   **Value Addition:** Do not just rephrase. Enrich the original text by adding valuable insights, fresh perspectives, or clarifying complex points.
     *   **Length:** The target length for the rewritten post is approximately 800 words. Prioritize quality, depth, and impact over meeting a strict word count.
 
-2.  **Structural Requirements (Strictly follow):**
+3.  **Apply Structural Requirements (Strictly follow):**
     *   **Table of Contents (TOC):**
         *   Generate a markdown-formatted, collapsible TOC using HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags.
         *   Each TOC item must be a markdown link pointing to a corresponding section anchor (e.g., \`[Section Title](#section-title)\`).
@@ -61,7 +66,8 @@ Your mission is to rewrite the provided blog content, elevating it to a professi
 **Input Data:**
 
 *   **Title:** \`{{{title}}}\`
-*   **Original Content/URL:** \`{{{content}}}\`
+*   **Original Content URL (optional):** \`{{{url}}}\`
+*   **Original Content Text (optional):** \`{{{content}}}\`
 
 **Final Output Format:**
 
