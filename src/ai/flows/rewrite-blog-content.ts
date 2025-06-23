@@ -1,5 +1,3 @@
-// This file is machine-generated - edit with caution!
-
 'use server';
 
 /**
@@ -51,6 +49,7 @@ const rewriteBlogContentPrompt = ai.definePrompt({
 2.  **Rewritten Content:**
     *   Rewrite the original content provided in the input.
     *   Improve clarity, flow, and engagement.
+    *   The rewritten blog post must be a minimum of 1200 words.
     *   Ensure the headings in the rewritten content have corresponding HTML anchors that match the links in the table of contents. For example, a heading for "Section 1" should be written as \`## <a id="section-1"></a>Section 1\`. The ID should be lowercase and use hyphens for spaces.
 
 **Input:**
