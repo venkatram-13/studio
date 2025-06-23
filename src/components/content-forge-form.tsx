@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Rocket, FileText, Link as LinkIcon, Heading1, ImageIcon } from 'lucide-react';
+import { Rocket, FileText, Link as LinkIcon, Heading1, ImageIcon, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RewriteFormSchema } from '@/lib/schemas';
 
@@ -31,6 +31,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
     defaultValues: {
       title: '',
       content: '',
+      imageUrl: '',
       imagePrompt: '',
       applyLink: '',
     },
@@ -41,7 +42,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
       <CardHeader>
         <CardTitle>Content to Rewrite</CardTitle>
         <CardDescription>
-          Enter the post details below. The AI will rewrite the content, generate a table of contents, and create a header image.
+          Enter the post details below. The AI will rewrite the content and create a header image.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -87,10 +88,41 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
 
             <FormField
               control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Header Image URL (Optional)</FormLabel>
+                  <div className="relative">
+                    <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <FormControl>
+                      <Input placeholder="https://example.com/image.png" className="pl-9" {...field} />
+                    </FormControl>
+                  </div>
+                   <FormDescription>
+                    Provide a direct link to an image to use as the header.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Or
+                </span>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
               name="imagePrompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image Prompt (Optional)</FormLabel>
+                  <FormLabel>Generate Header Image (Optional)</FormLabel>
                   <div className="relative">
                     <ImageIcon className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -102,7 +134,7 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
                     </FormControl>
                   </div>
                    <FormDescription>
-                    Describe the header image you want the AI to generate.
+                    If you don't provide an image URL, describe the header image you want the AI to generate.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

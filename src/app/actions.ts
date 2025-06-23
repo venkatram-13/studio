@@ -11,13 +11,18 @@ export async function handleRewriteContent(data: FormData) {
   try {
     const validatedData = RewriteFormSchema.parse(data);
 
+    // If an image URL is provided, use it. Otherwise, generate an image from the prompt.
+    const imagePromise: Promise<string | null> = validatedData.imageUrl
+      ? Promise.resolve(validatedData.imageUrl)
+      : generateImage(validatedData.imagePrompt);
+
     const [rewriteResult, imageResult] = await Promise.all([
       rewriteBlogContent({
         title: validatedData.title,
         content: validatedData.content,
         applyLink: validatedData.applyLink,
       }),
-      generateImage(validatedData.imagePrompt)
+      imagePromise
     ]);
 
 
