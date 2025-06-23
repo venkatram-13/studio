@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Code, Sparkles, ExternalLink } from 'lucide-react';
+import { Code, Sparkles, ExternalLink, Clipboard, Check } from 'lucide-react';
+import { useState } from 'react';
 
 type ContentPreviewProps = {
   result: {
@@ -59,6 +60,8 @@ const Placeholder = () => (
 );
 
 export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
+  const [isCopied, setIsCopied] = useState(false);
+
   if (isLoading) {
     return <LoadingSkeleton />;
   }
@@ -66,6 +69,17 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
   if (!result?.rewrittenContent) {
     return <Placeholder />;
   }
+
+  const handleCopy = () => {
+    if (result?.rewrittenContent) {
+      navigator.clipboard.writeText(result.rewrittenContent).then(() => {
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 2000);
+      });
+    }
+  };
 
   return (
     <Card className="h-full flex flex-col">
@@ -105,6 +119,16 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
             </TabsContent>
             <TabsContent value="markdown">
               <div className="bg-muted p-4 rounded-md relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-2 right-2 h-8 w-8"
+                  onClick={handleCopy}
+                  title={isCopied ? 'Copied!' : 'Copy markdown'}
+                >
+                  <span className="sr-only">Copy Markdown</span>
+                  {isCopied ? <Check className="h-4 w-4 text-primary" /> : <Clipboard className="h-4 w-4" />}
+                </Button>
                 <pre className="text-sm font-code whitespace-pre-wrap break-words">
                   <code>{result.rewrittenContent}</code>
                 </pre>
