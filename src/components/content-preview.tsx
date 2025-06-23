@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Code, Sparkles, ExternalLink, Clipboard, Check } from 'lucide-react';
+import { Code, Sparkles, ExternalLink, Clipboard, Check, Download } from 'lucide-react';
 import { useState } from 'react';
 
 type ContentPreviewProps = {
@@ -102,13 +102,24 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
           <div className="flex-1 overflow-y-auto mt-4 pr-2">
             <TabsContent value="preview">
               {result.generatedImage && (
-                <div className="mb-6 rounded-lg overflow-hidden shadow-lg">
+                <div className="relative group mb-6 rounded-lg overflow-hidden shadow-lg">
                   <img
                     src={result.generatedImage}
                     alt="AI Generated Image"
                     className="w-full h-auto"
                     data-ai-hint="blog image"
                   />
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-3 right-3 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <a href={result.generatedImage} download="generated-header-image.png">
+                      <Download className="h-5 w-5" />
+                      <span className="sr-only">Download Image</span>
+                    </a>
+                  </Button>
                 </div>
               )}
               <div className="markdown-preview">
