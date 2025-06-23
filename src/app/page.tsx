@@ -33,6 +33,9 @@ export default function Home() {
     setIsContentLoading(true);
     try {
       const response = await generateTextContent(data);
+      if (response.error) {
+        throw new Error(response.error);
+      }
       setResult((prev) => ({
         ...prev,
         executiveSummary: response.executiveSummary,
@@ -57,6 +60,9 @@ export default function Home() {
     setIsImageLoading(true);
     try {
       const response = await generateHeaderImage(data);
+      if (response.error) {
+        throw new Error(response.error);
+      }
       setResult((prev) => ({
         ...prev,
         generatedImage: response.generatedImage,

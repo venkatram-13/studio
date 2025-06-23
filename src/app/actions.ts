@@ -7,7 +7,21 @@ import { RewriteFormSchema } from '@/lib/schemas';
 
 type FormData = z.infer<typeof RewriteFormSchema>;
 
-export async function generateTextContent(data: FormData) {
+type TextContentResult = {
+  executiveSummary: string;
+  rewrittenContent: string;
+  applyLink: string;
+  source: 'scraped' | 'generated';
+  error?: undefined;
+} | { error: string };
+
+type ImageContentResult = {
+  generatedImage: string | null;
+  error?: undefined;
+} | { error: string };
+
+
+export async function generateTextContent(data: FormData): Promise<TextContentResult> {
   try {
     const validatedData = RewriteFormSchema.parse(data);
 
@@ -31,16 +45,16 @@ export async function generateTextContent(data: FormData) {
   } catch (error) {
     console.error('Error in generateTextContent:', error);
     if (error instanceof z.ZodError) {
-      throw new Error(`Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+      return { error: `Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}` };
     }
     if (error instanceof Error) {
-      throw new Error(error.message);
+      return { error: error.message };
     }
-    throw new Error('An unexpected error occurred while processing your request.');
+    return { error: 'An unexpected error occurred while processing your request.' };
   }
 }
 
-export async function generateHeaderImage(data: FormData) {
+export async function generateHeaderImage(data: FormData): Promise<ImageContentResult> {
     try {
         const validatedData = RewriteFormSchema.parse(data);
         
@@ -58,11 +72,11 @@ export async function generateHeaderImage(data: FormData) {
     } catch (error) {
         console.error('Error in generateHeaderImage:', error);
         if (error instanceof z.ZodError) {
-            throw new Error(`Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+             return { error: `Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}` };
         }
         if (error instanceof Error) {
-            throw new Error(error.message);
+            return { error: error.message };
         }
-        throw new Error('An unexpected error occurred while generating the image.');
+        return { error: 'An unexpected error occurred while generating the image.' };
     }
 }
