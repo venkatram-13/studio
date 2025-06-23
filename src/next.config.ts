@@ -1,13 +1,3 @@
-import type {NextConfig} from 'next';
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-};
-
-export default nextConfig;
+// This file is intentionally left empty to resolve a configuration conflict.
+// The primary Next.js config is located at the project root.
+export {};
