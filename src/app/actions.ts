@@ -23,6 +23,7 @@ export async function generateTextContent(data: FormData) {
     }
 
     return {
+      executiveSummary: rewriteResult.executiveSummary,
       rewrittenContent: rewriteResult.rewrittenContent,
       applyLink: validatedData.applyLink,
       source: rewriteResult.source,

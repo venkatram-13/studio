@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 type FormData = z.infer<typeof RewriteFormSchema>;
 
 type PartialResult = {
+  executiveSummary: string | null;
   rewrittenContent: string | null;
   applyLink: string | null;
   generatedImage: string | null;
@@ -34,6 +35,7 @@ export default function Home() {
       const response = await generateTextContent(data);
       setResult((prev) => ({
         ...prev,
+        executiveSummary: response.executiveSummary,
         rewrittenContent: response.rewrittenContent,
         applyLink: response.applyLink,
         source: response.source,

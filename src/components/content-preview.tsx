@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 
 type ContentPreviewProps = {
   result: {
+    executiveSummary: string | null;
     rewrittenContent: string | null;
     applyLink: string | null;
     generatedImage: string | null;
@@ -65,8 +66,12 @@ export function ContentPreview({ result, isContentLoading, isImageLoading, onReg
   }
 
   const handleCopy = () => {
-    if (result?.rewrittenContent) {
-      navigator.clipboard.writeText(result.rewrittenContent).then(() => {
+    if (result?.rewrittenContent || result?.executiveSummary) {
+      const fullContent = result.executiveSummary
+        ? `${result.executiveSummary}\n\n---\n\n${result.rewrittenContent || ''}`
+        : result.rewrittenContent || '';
+
+      navigator.clipboard.writeText(fullContent).then(() => {
         setIsCopied(true);
         setTimeout(() => {
           setIsCopied(false);
@@ -166,25 +171,30 @@ export function ContentPreview({ result, isContentLoading, isImageLoading, onReg
               {isContentLoading ? (
                 <TextContentSkeleton />
               ) : (
-                result?.rewrittenContent && (
-                  <>
+                <>
+                  {result?.executiveSummary && (
+                    <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4 text-base italic text-foreground/80">
+                      <p>{result.executiveSummary}</p>
+                    </div>
+                  )}
+                  {result?.rewrittenContent && (
                     <div className="markdown-preview">
                       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                         {result.rewrittenContent}
                       </ReactMarkdown>
                     </div>
-                    {result.applyLink && (
-                      <div className="mt-8 text-center">
-                        <Button asChild size="lg">
-                          <a href={result.applyLink} target="_blank" rel="noopener noreferrer">
-                            Apply Now
-                            <ExternalLink className="w-4 h-4 ml-2" />
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                )
+                  )}
+                  {result?.applyLink && (
+                    <div className="mt-8 text-center">
+                      <Button asChild size="lg">
+                        <a href={result.applyLink} target="_blank" rel="noopener noreferrer">
+                          Apply Now
+                          <ExternalLink className="w-4 h-4 ml-2" />
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </TabsContent>
             <TabsContent value="markdown">
@@ -192,7 +202,7 @@ export function ContentPreview({ result, isContentLoading, isImageLoading, onReg
                  {isContentLoading ? (
                   <TextContentSkeleton />
                 ) : (
-                   result?.rewrittenContent && (
+                   (result?.rewrittenContent || result?.executiveSummary) && (
                     <>
                       <Button
                         variant="ghost"
@@ -205,7 +215,10 @@ export function ContentPreview({ result, isContentLoading, isImageLoading, onReg
                         {isCopied ? <Check className="h-4 w-4 text-primary" /> : <Clipboard className="h-4 w-4" />}
                       </Button>
                       <pre className="text-sm font-code whitespace-pre-wrap break-words">
-                        <code>{result.rewrittenContent}</code>
+                        <code>
+                          {result.executiveSummary ? `${result.executiveSummary}\n\n---\n\n` : ''}
+                          {result.rewrittenContent}
+                        </code>
                       </pre>
                     </>
                    )

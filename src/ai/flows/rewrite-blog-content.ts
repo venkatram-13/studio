@@ -27,10 +27,12 @@ const PromptInputSchema = z.object({
 });
 
 const PromptOutputSchema = z.object({
+  executiveSummary: z.string().describe('A concise, one-paragraph executive summary of the job posting, written in a professional and engaging tone.'),
   rewrittenContent: z.string().describe('The rewritten job posting with a table of contents.'),
 });
 
 const RewriteBlogContentOutputSchema = z.object({
+  executiveSummary: z.string().describe('A concise, one-paragraph executive summary of the job posting.'),
   rewrittenContent: z.string().describe('The rewritten job posting with a table of contents.'),
   source: z.enum(['scraped', 'generated']).describe('Indicates if the content was based on a scraped URL/pasted text, or generated from scratch.'),
 });
@@ -60,23 +62,20 @@ Your mission is to rewrite the provided job posting content, or if no content is
     *   **If Scraped Content is provided:** Use this as your primary source. Your task is to rewrite and enhance it.
     *   **If Scraped Content is EMPTY:** Your task is to generate a new, high-quality job posting from scratch. Use the Job Title and the context you can infer from the URL to create a comprehensive and appealing description. Assume standard roles and responsibilities for the given job title.
 
-2.  **Rewrite/Generate based on Core Directives:**
-    *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy for a potential candidate to follow. Structure the content logically, perhaps with sections like "About Us," "The Role," "Your Responsibilities," "What You'll Bring," and "Why You'll Love Working Here."
-    *   **Tone & Style:** The tone must be professional, yet warm, engaging, and inclusive. Use an active voice and speak directly to the candidate (e.g., "You will..." instead of "The successful candidate will..."). Avoid corporate jargon and clichés. The goal is to make the company and role sound exciting and appealing.
-    *   **Value Proposition:** Don't just list requirements. Sell the opportunity. Highlight the company culture, growth opportunities, impactful projects, and key benefits. Frame the role in terms of what the candidate will achieve and learn.
+2.  **Generate Executive Summary:**
+    *   First, craft a compelling, one-paragraph executive summary (around 50-70 words) for the \`executiveSummary\` field. This summary should act as a hook, quickly communicating the role's value proposition and enticing the candidate to read further.
 
-3.  **Apply Structural Requirements (Strictly follow):**
-    *   **Table of Contents (TOC):**
-        *   Generate a markdown-formatted, collapsible TOC using HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags. This will help candidates navigate the job description.
-        *   Each TOC item must be a markdown link pointing to a corresponding section anchor (e.g., \`[About Us](#about-us)\`).
-    *   **Headings & Anchors:**
-        *   The rewritten content must be structured with H2 and H3 markdown headings.
-        *   Crucially, every heading must have an HTML anchor tag with an ID that matches its TOC link. The ID must be lowercase with hyphens for spaces.
-        *   **Example:** A section titled "About Us" should be formatted as \`## <a id="about-us"></a>About Us\`.
+3.  **Rewrite/Generate Main Content:**
+    *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy for a potential candidate to follow. Structure it logically with sections like "About Us," "The Role," "Your Responsibilities," "What You'll Bring," and "Why You'll Love Working Here."
+    *   **Tone & Style:** The tone must be professional, yet warm, engaging, and inclusive. Use an active voice and speak directly to the candidate (e.g., "You will..."). Avoid corporate jargon.
+    *   **Value Proposition:** Don't just list requirements. Sell the opportunity. Highlight company culture, growth opportunities, and key benefits.
 
-**Final Output Format:**
+4.  **Format Main Content:**
+    *   The main content must be a single markdown string for the \`rewrittenContent\` field.
+    *   It **must** begin with a collapsible Table of Contents using HTML \`<details>\` and \`<summary>\` tags.
+    *   All H2/H3 headings in the content must have corresponding HTML anchor tags with lowercase, hyphenated IDs (e.g., \`## <a id="about-us"></a>About Us\`).
 
-Produce a single markdown string. This string must begin with the complete collapsible HTML table of contents, immediately followed by the full, rewritten job posting with the correctly formatted and anchored headings. Do not include the title in the output itself.
+Do not include the job title in the output content itself.
 `,
 });
 
@@ -110,11 +109,12 @@ const rewriteBlogContentFlow = ai.defineFlow(
       url: input.url,
     });
 
-    if (!output?.rewrittenContent) {
+    if (!output?.rewrittenContent || !output?.executiveSummary) {
       throw new Error('AI failed to generate content.');
     }
 
     return {
+      executiveSummary: output.executiveSummary,
       rewrittenContent: output.rewrittenContent,
       source,
     };
