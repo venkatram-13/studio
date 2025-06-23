@@ -39,24 +39,29 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <header className="shrink-0 border-b">
+    <div className="flex flex-col h-screen">
+      <header className="shrink-0 border-b bg-card">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2">
-              <WandSparkles className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-bold text-foreground font-headline">ContentForge</h1>
+          <div className="flex h-20 items-center">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 p-2 rounded-lg">
+                <WandSparkles className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground font-headline">ContentForge</h1>
+                <p className="text-sm text-muted-foreground">AI-powered content rewriting and enhancement.</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
       <main className="flex-1 overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6 h-full py-6">
+        <div className="container mx-auto px-4 md:px-6 h-full py-8">
           <div className="grid lg:grid-cols-2 gap-8 h-full items-start">
-            <div className="h-full overflow-y-auto rounded-lg">
+            <div className="h-full overflow-y-auto rounded-lg pr-4">
               <ContentForgeForm onSubmit={handleFormSubmit} isPending={isLoading} />
             </div>
-            <div className="h-full overflow-y-auto rounded-lg">
+            <div className="h-full overflow-y-auto rounded-lg pr-4">
               <ContentPreview result={result} isLoading={isLoading} />
             </div>
           </div>

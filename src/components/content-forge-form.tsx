@@ -36,11 +36,11 @@ export function ContentForgeForm({ onSubmit, isPending }: ContentForgeFormProps)
   });
 
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Content Input</CardTitle>
+        <CardTitle>Content to Rewrite</CardTitle>
         <CardDescription>
-          Provide the details of your blog post to be rewritten by AI.
+          Enter the post details below. The AI will rewrite the content and generate a table of contents.
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -46,18 +46,19 @@ const LoadingSkeleton = () => (
 );
 
 const Placeholder = () => (
-  <Card className="flex h-full items-center justify-center">
+  <Card className="flex h-full items-center justify-center border-dashed border-2 bg-transparent shadow-none">
     <div className="flex flex-col items-center justify-center text-center p-8">
-      <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-8 border-primary/20">
-        <Sparkles className="w-12 h-12 text-primary" />
+      <div className="w-20 h-20 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+        <Sparkles className="w-10 h-10 text-primary" />
       </div>
-      <h3 className="text-xl font-semibold font-headline">Your rewritten content will appear here</h3>
-      <p className="text-muted-foreground mt-2 max-w-sm">
-        Fill out the form and let our AI work its magic. The result will be shown in markdown and a rendered preview.
+      <h3 className="text-2xl font-semibold font-headline">Content Appears Here</h3>
+      <p className="text-muted-foreground mt-2 max-w-md">
+        Once you submit your content, the rewritten version will be displayed here. You can switch between a rendered preview and raw markdown.
       </p>
     </div>
   </Card>
 );
+
 
 export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
   const [isCopied, setIsCopied] = useState(false);
@@ -82,7 +83,7 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>Generated Content</CardTitle>
         <CardDescription>
