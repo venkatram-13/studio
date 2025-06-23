@@ -14,6 +14,7 @@ type PartialResult = {
   rewrittenContent: string | null;
   applyLink: string | null;
   generatedImage: string | null;
+  source: 'scraped' | 'generated' | null;
 };
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
           ...prev,
           rewrittenContent: response.rewrittenContent,
           applyLink: response.applyLink,
+          source: response.source,
         }));
       })
       .catch((error) => {

@@ -32,6 +32,7 @@ const PromptOutputSchema = z.object({
 
 const RewriteBlogContentOutputSchema = z.object({
   rewrittenContent: z.string().describe('The rewritten job posting with a table of contents.'),
+  source: z.enum(['scraped', 'generated']).describe('Indicates if the content was based on a scraped URL/pasted text, or generated from scratch.'),
 });
 export type RewriteBlogContentOutput = z.infer<typeof RewriteBlogContentOutputSchema>;
 
@@ -87,15 +88,20 @@ const rewriteBlogContentFlow = ai.defineFlow(
   },
   async (input) => {
     let contentToRewrite = input.content;
+    let source: 'scraped' | 'generated' = 'generated';
 
     if (input.url) {
       try {
         contentToRewrite = await scrapeUrlContent(input.url);
+        source = 'scraped';
       } catch (error) {
         console.warn(`URL scraping failed for "${input.url}". Falling back to AI generation. Error: ${error instanceof Error ? error.message : String(error)}`);
         // Set content to empty so the AI knows to generate from scratch
         contentToRewrite = '';
+        source = 'generated';
       }
+    } else if (input.content) {
+      source = 'scraped'; // Treat pasted text as "scraped"
     }
     
     const {output} = await rewriteBlogContentPrompt({
@@ -110,6 +116,7 @@ const rewriteBlogContentFlow = ai.defineFlow(
 
     return {
       rewrittenContent: output.rewrittenContent,
+      source,
     };
   }
 );

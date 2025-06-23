@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Code, Sparkles, ExternalLink, Clipboard, Check, Download } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Code, Sparkles, ExternalLink, Clipboard, Check, Download, Info } from 'lucide-react';
 import { useState } from 'react';
 
 type ContentPreviewProps = {
@@ -15,6 +16,7 @@ type ContentPreviewProps = {
     rewrittenContent: string | null;
     applyLink: string | null;
     generatedImage: string | null;
+    source: 'scraped' | 'generated' | null;
   } | null;
   isContentLoading: boolean;
   isImageLoading: boolean;
@@ -70,6 +72,10 @@ export function ContentPreview({ result, isContentLoading, isImageLoading }: Con
     }
   };
 
+  const sourceText = result?.source === 'scraped' 
+    ? 'Content was rewritten based on the provided text/URL.' 
+    : 'Content was generated from scratch based on the title.';
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -77,6 +83,14 @@ export function ContentPreview({ result, isContentLoading, isImageLoading }: Con
         <CardDescription>
           Here is the AI-generated version of your content and image.
         </CardDescription>
+        {result?.source && !isContentLoading && (
+          <Alert className="mt-2 text-sm">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              {sourceText}
+            </AlertDescription>
+          </Alert>
+        )}
       </CardHeader>
       <CardContent className="flex-1 min-h-0">
         <Tabs defaultValue="preview" className="flex flex-col h-full">

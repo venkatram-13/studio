@@ -25,6 +25,7 @@ export async function generateTextContent(data: FormData) {
     return {
       rewrittenContent: rewriteResult.rewrittenContent,
       applyLink: validatedData.applyLink,
+      source: rewriteResult.source,
     };
   } catch (error) {
     console.error('Error in generateTextContent:', error);
