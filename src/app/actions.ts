@@ -7,28 +7,16 @@ import { RewriteFormSchema } from '@/lib/schemas';
 
 type FormData = z.infer<typeof RewriteFormSchema>;
 
-export async function handleRewriteContent(data: FormData) {
+export async function generateTextContent(data: FormData) {
   try {
     const validatedData = RewriteFormSchema.parse(data);
 
-    let imagePromise: Promise<string | null>;
-
-    if (validatedData.imageUrl) {
-      imagePromise = Promise.resolve(validatedData.imageUrl);
-    } else if (validatedData.imagePrompt) {
-      imagePromise = generateImage(validatedData.imagePrompt);
-    } else {
-      imagePromise = Promise.resolve(null);
-    }
-
-    const rewritePromise = rewriteBlogContent({
+    const rewriteResult = await rewriteBlogContent({
       title: validatedData.title,
       content: validatedData.content,
       url: validatedData.url,
       applyLink: validatedData.applyLink,
     });
-
-    const [rewriteResult, generatedImage] = await Promise.all([rewritePromise, imagePromise]);
 
     if (!rewriteResult || !rewriteResult.rewrittenContent) {
       throw new Error('AI failed to generate content.');
@@ -37,10 +25,9 @@ export async function handleRewriteContent(data: FormData) {
     return {
       rewrittenContent: rewriteResult.rewrittenContent,
       applyLink: validatedData.applyLink,
-      generatedImage: generatedImage,
     };
   } catch (error) {
-    console.error('Error in handleRewriteContent:', error);
+    console.error('Error in generateTextContent:', error);
     if (error instanceof z.ZodError) {
       throw new Error(`Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
     }
@@ -49,4 +36,31 @@ export async function handleRewriteContent(data: FormData) {
     }
     throw new Error('An unexpected error occurred while processing your request.');
   }
+}
+
+export async function generateHeaderImage(data: FormData) {
+    try {
+        const validatedData = RewriteFormSchema.parse(data);
+        
+        if (validatedData.imageUrl) {
+            return { generatedImage: validatedData.imageUrl };
+        }
+        
+        if (validatedData.imagePrompt) {
+            const generatedImage = await generateImage(validatedData.imagePrompt);
+            return { generatedImage };
+        }
+
+        return { generatedImage: null };
+
+    } catch (error) {
+        console.error('Error in generateHeaderImage:', error);
+        if (error instanceof z.ZodError) {
+            throw new Error(`Validation failed: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+        }
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error('An unexpected error occurred while generating the image.');
+    }
 }

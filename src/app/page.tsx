@@ -4,41 +4,74 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { ContentForgeForm } from '@/components/content-forge-form';
 import { ContentPreview } from '@/components/content-preview';
-import { handleRewriteContent } from '@/app/actions';
+import { generateTextContent, generateHeaderImage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { WandSparkles } from 'lucide-react';
 import { RewriteFormSchema } from '@/lib/schemas';
 import { ThemeToggle } from '@/components/theme-toggle';
 
-type RewriteResult = {
-  rewrittenContent: string;
-  applyLink: string;
+type PartialResult = {
+  rewrittenContent: string | null;
+  applyLink: string | null;
   generatedImage: string | null;
-} | null;
+};
 
 export default function Home() {
-  const [result, setResult] = useState<RewriteResult>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<PartialResult | null>(null);
+  const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
   const { toast } = useToast();
 
   const handleFormSubmit = async (data: z.infer<typeof RewriteFormSchema>) => {
-    setIsLoading(true);
     setResult(null);
-    try {
-      const response = await handleRewriteContent(data);
-      setResult(response);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred',
-        description:
-          error instanceof Error ? error.message : 'Please try again.',
+    setIsContentLoading(true);
+    setIsImageLoading(true);
+
+    const textPromise = generateTextContent(data)
+      .then((response) => {
+        setResult((prev) => ({
+          ...prev,
+          rewrittenContent: response.rewrittenContent,
+          applyLink: response.applyLink,
+        }));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Error generating content',
+          description:
+            error instanceof Error ? error.message : 'Please try again.',
+        });
+      })
+      .finally(() => {
+        setIsContentLoading(false);
       });
-    } finally {
-      setIsLoading(false);
-    }
+
+    const imagePromise = generateHeaderImage(data)
+      .then((response) => {
+        setResult((prev) => ({
+          ...prev,
+          generatedImage: response.generatedImage,
+        }));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Error generating image',
+          description:
+            error instanceof Error ? error.message : 'Please try again.',
+        });
+      })
+      .finally(() => {
+        setIsImageLoading(false);
+      });
+
+    await Promise.allSettled([textPromise, imagePromise]);
   };
+
+  const isLoading = isContentLoading || isImageLoading;
 
   return (
     <div className="flex flex-col h-screen">
@@ -65,7 +98,11 @@ export default function Home() {
               <ContentForgeForm onSubmit={handleFormSubmit} isPending={isLoading} />
             </div>
             <div className="h-full overflow-y-auto rounded-lg pr-4">
-              <ContentPreview result={result} isLoading={isLoading} />
+              <ContentPreview
+                result={result}
+                isContentLoading={isContentLoading}
+                isImageLoading={isImageLoading}
+              />
             </div>
           </div>
         </div>

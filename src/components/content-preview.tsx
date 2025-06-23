@@ -12,34 +12,28 @@ import { useState } from 'react';
 
 type ContentPreviewProps = {
   result: {
-    rewrittenContent: string;
-    applyLink: string;
+    rewrittenContent: string | null;
+    applyLink: string | null;
     generatedImage: string | null;
   } | null;
-  isLoading: boolean;
+  isContentLoading: boolean;
+  isImageLoading: boolean;
 };
 
-const LoadingSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-7 w-3/5" />
-      <Skeleton className="h-4 w-4/5 mt-2" />
-    </CardHeader>
-    <CardContent className="space-y-4">
-       <Skeleton className="w-full aspect-video rounded-lg" />
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-1/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-4 w-1/3" />
-      </div>
-      <div className="space-y-2 pt-4">
-        <Skeleton className="h-5 w-1/3" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-      </div>
-    </CardContent>
-  </Card>
+const TextContentSkeleton = () => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Skeleton className="h-5 w-1/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-1/3" />
+    </div>
+    <div className="space-y-2 pt-4">
+      <Skeleton className="h-5 w-1/3" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+    </div>
+  </div>
 );
 
 const Placeholder = () => (
@@ -57,14 +51,11 @@ const Placeholder = () => (
 );
 
 
-export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
+export function ContentPreview({ result, isContentLoading, isImageLoading }: ContentPreviewProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const isLoading = isContentLoading || isImageLoading;
 
-  if (isLoading) {
-    return <LoadingSkeleton />;
-  }
-
-  if (!result?.rewrittenContent) {
+  if (!isLoading && !result) {
     return <Placeholder />;
   }
 
@@ -101,56 +92,78 @@ export function ContentPreview({ result, isLoading }: ContentPreviewProps) {
           </TabsList>
           <div className="flex-1 overflow-y-auto mt-4 pr-2">
             <TabsContent value="preview">
-              {result.generatedImage && (
-                <div className="relative group mb-6 rounded-lg overflow-hidden shadow-lg">
-                  <img
-                    src={result.generatedImage}
-                    alt="AI Generated Image"
-                    className="w-full h-auto"
-                    data-ai-hint="blog image"
-                  />
-                  <Button
-                    asChild
-                    variant="secondary"
-                    size="icon"
-                    className="absolute top-3 right-3 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <a href={result.generatedImage} download="generated-header-image.png">
-                      <Download className="h-5 w-5" />
-                      <span className="sr-only">Download Image</span>
-                    </a>
-                  </Button>
-                </div>
+              {isImageLoading ? (
+                 <Skeleton className="w-full aspect-video rounded-lg mb-6 shadow-lg" />
+              ) : (
+                result?.generatedImage && (
+                  <div className="relative group mb-6 rounded-lg overflow-hidden shadow-lg">
+                    <img
+                      src={result.generatedImage}
+                      alt="AI Generated Image"
+                      className="w-full h-auto"
+                      data-ai-hint="blog image"
+                    />
+                    <Button
+                      asChild
+                      variant="secondary"
+                      size="icon"
+                      className="absolute top-3 right-3 h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <a href={result.generatedImage} download="generated-header-image.png">
+                        <Download className="h-5 w-5" />
+                        <span className="sr-only">Download Image</span>
+                      </a>
+                    </Button>
+                  </div>
+                )
               )}
-              <div className="markdown-preview">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                  {result.rewrittenContent}
-                </ReactMarkdown>
-              </div>
-              <div className="mt-8 text-center">
-                <Button asChild size="lg">
-                  <a href={result.applyLink} target="_blank" rel="noopener noreferrer">
-                    Apply Now
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
-                </Button>
-              </div>
+              {isContentLoading ? (
+                <TextContentSkeleton />
+              ) : (
+                result?.rewrittenContent && (
+                  <>
+                    <div className="markdown-preview">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        {result.rewrittenContent}
+                      </ReactMarkdown>
+                    </div>
+                    {result.applyLink && (
+                      <div className="mt-8 text-center">
+                        <Button asChild size="lg">
+                          <a href={result.applyLink} target="_blank" rel="noopener noreferrer">
+                            Apply Now
+                            <ExternalLink className="w-4 h-4 ml-2" />
+                          </a>
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )
+              )}
             </TabsContent>
             <TabsContent value="markdown">
               <div className="bg-muted p-4 rounded-md relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-2 right-2 h-8 w-8"
-                  onClick={handleCopy}
-                  title={isCopied ? 'Copied!' : 'Copy markdown'}
-                >
-                  <span className="sr-only">Copy Markdown</span>
-                  {isCopied ? <Check className="h-4 w-4 text-primary" /> : <Clipboard className="h-4 w-4" />}
-                </Button>
-                <pre className="text-sm font-code whitespace-pre-wrap break-words">
-                  <code>{result.rewrittenContent}</code>
-                </pre>
+                 {isContentLoading ? (
+                  <TextContentSkeleton />
+                ) : (
+                   result?.rewrittenContent && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 h-8 w-8"
+                        onClick={handleCopy}
+                        title={isCopied ? 'Copied!' : 'Copy markdown'}
+                      >
+                        <span className="sr-only">Copy Markdown</span>
+                        {isCopied ? <Check className="h-4 w-4 text-primary" /> : <Clipboard className="h-4 w-4" />}
+                      </Button>
+                      <pre className="text-sm font-code whitespace-pre-wrap break-words">
+                        <code>{result.rewrittenContent}</code>
+                      </pre>
+                    </>
+                   )
+                )}
               </div>
             </TabsContent>
           </div>
