@@ -37,29 +37,35 @@ const rewriteBlogContentPrompt = ai.definePrompt({
   name: 'rewriteBlogContentPrompt',
   input: {schema: RewriteBlogContentInputSchema},
   output: {schema: PromptOutputSchema},
-  prompt: `You are an expert blog content writer. Your task is to rewrite the provided blog content to enhance readability and engagement.
+  prompt: `You are an elite content strategist and SEO expert, renowned for transforming dry or complex topics into compelling, insightful, and highly engaging blog posts.
 
-**Instructions:**
+Your mission is to rewrite the provided blog content, elevating it to a professional standard.
 
-1.  **Table of Contents:**
-    *   Generate a markdown-formatted table of contents for the rewritten blog post.
-    *   Use markdown links (e.g., \`[Section 1](#section-1)\`) for each item.
-    *   Make the Table of Contents collapsible by wrapping it in HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags.
+**Core Directives:**
 
-2.  **Rewritten Content:**
-    *   Rewrite the original content provided in the input.
-    *   Improve clarity, flow, and engagement.
-    *   The rewritten blog post must be a minimum of 1200 words.
-    *   Ensure the headings in the rewritten content have corresponding HTML anchors that match the links in the table of contents. For example, a heading for "Section 1" should be written as \`## <a id="section-1"></a>Section 1\`. The ID should be lowercase and use hyphens for spaces.
+1.  **Content Transformation:**
+    *   **Clarity & Flow:** Rewrite the content to be exceptionally clear, logical, and easy to follow. Ensure smooth transitions between ideas and sections.
+    *   **Engagement:** Adopt a professional yet approachable tone. Use storytelling, relevant examples, and rhetorical questions to captivate the reader.
+    *   **Value Addition:** Do not just rephrase. Enrich the original text by adding valuable insights, fresh perspectives, or clarifying complex points.
+    *   **Length:** The target length for the rewritten post is approximately 800 words. Prioritize quality, depth, and impact over meeting a strict word count.
 
-**Input:**
+2.  **Structural Requirements (Strictly follow):**
+    *   **Table of Contents (TOC):**
+        *   Generate a markdown-formatted, collapsible TOC using HTML \`<details>\` and \`<summary>Table of Contents</summary>\` tags.
+        *   Each TOC item must be a markdown link pointing to a corresponding section anchor (e.g., \`[Section Title](#section-title)\`).
+    *   **Headings & Anchors:**
+        *   The rewritten content must be structured with H2 and H3 markdown headings.
+        *   Crucially, every heading must have an HTML anchor tag with an ID that matches its TOC link. The ID must be lowercase with hyphens for spaces.
+        *   **Example:** A section titled "Our Core Mission" should be formatted as \`## <a id="our-core-mission"></a>Our Core Mission\`.
+
+**Input Data:**
 
 *   **Title:** \`{{{title}}}\`
 *   **Original Content/URL:** \`{{{content}}}\`
 
-**Output:**
+**Final Output Format:**
 
-Provide a single markdown string that contains the collapsible table of contents, followed by the full rewritten blog post with linked headings. Do not include the title in your output.
+Produce a single markdown string. This string must begin with the complete collapsible HTML table of contents, immediately followed by the full, rewritten blog post with the correctly formatted and anchored headings. Do not include the title in the output itself.
 `,
 });
 
